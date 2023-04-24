@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 
-import { FsClipboard } from '@firestitch/clipboard';
+import { FsClipboard } from '@firestitch/cordova';
 
 
 @Component({

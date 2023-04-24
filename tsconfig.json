@@ -2,7 +2,7 @@
   "extends": "./node_modules/@firestitch/component-tools/config/tsconfig.cli.json",
   "compilerOptions": {
     "paths": {
-      "@firestitch/clipboard": [
+      "@firestitch/cordova": [
         "src/public_api.ts"
       ],
       "@env": [
