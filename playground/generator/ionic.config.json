@@ -1,3 +1,15 @@
 {
-  "projects": {}
+  "name": "My App",
+
+  "type": "angular",
+
+  "id": "abc123",
+
+  "integrations": {
+    "cordova": {
+    }
+  },
+
+  "hooks": {
+  }
 }
