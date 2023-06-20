@@ -82,7 +82,7 @@ const routes: Routes = [
         return new CordovaFileClickInterceptor(ngZone);
       },
       deps: [NgZone],
-    }
+    },
   ]
 })
 export class PlaygroundModule {

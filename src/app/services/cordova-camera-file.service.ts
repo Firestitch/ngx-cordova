@@ -25,7 +25,7 @@ export class CordovaCameraFileService {
   public selectCordovaCameraPicture(): Observable<File> {
     const options: any = {
       destinationType: this.cordova.camera.DestinationType.FILE_URI,
-      encodingType: this.cordova.camera.DestinationType.JPEG,
+      encodingType: this.cordova.camera.EncodingType.JPEG,
       sourceType: this.cordova.camera.PictureSourceType.CAMERA,
       mediaType: this.cordova.camera.MediaType.PICTURE,
       quality: 100,

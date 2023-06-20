@@ -26,7 +26,7 @@ export class CordovaFileClickInterceptor extends FileClickInterceptor {
       // } else 
       
       if (inputProcessorService.capture === 'camera' && inputProcessorService.isAcceptImage()) {
-        (new CordovaCameraFileService())
+        return (new CordovaCameraFileService())
           .selectCordovaCameraPicture()
           .pipe(
             tap((file: File) => {
@@ -34,9 +34,7 @@ export class CordovaFileClickInterceptor extends FileClickInterceptor {
                 inputProcessorService.selectFiles([file]);
               });
             }),
-          );
-
-        return of(null);   
+          );  
       }
     }
   
