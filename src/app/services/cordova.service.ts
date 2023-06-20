@@ -133,6 +133,9 @@ export class FsCordova {
         this.FileReader = this.window.FileReader;
         this.window.File = nativeFile;
         this.window.FileReader = nativeFileReader;
+
+        this.window.CordovaFile = this.File;
+        this.window.CordovaFileReader = this.FileReader;
       });
   }
 

@@ -1,4 +1,4 @@
-import { APP_INITIALIZER, NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule, NgZone } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Routes } from '@angular/router';
 import { BrowserModule } from '@angular/platform-browser';
@@ -18,11 +18,12 @@ import {
 } from './components';
 import { AppComponent } from './app.component';
 import { FsCordovaModule } from 'src/app/cordova.module';
-import { CordovaHttpInterceptor, FsCordova, FsCordovaHttp } from '@firestitch/cordova';
+import { CordovaCameraFileService, CordovaFileClickInterceptor, CordovaHttpInterceptor, FsCordova, FsCordovaHttp } from '@firestitch/cordova';
 import { of } from 'rxjs';
 import { switchMap, tap } from 'rxjs/operators';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { Platform } from '@ionic/angular';
+import { FS_FILE_CLICK_INTERCEPTOR } from '@firestitch/file';
 
 
 const routes: Routes = [
@@ -74,6 +75,14 @@ const routes: Routes = [
       multi: true,
       deps: [Platform, FsCordovaHttp],
     },
+    {
+      provide: FS_FILE_CLICK_INTERCEPTOR,
+      multi: true,
+      useFactory: (ngZone: NgZone) => {
+        return new CordovaFileClickInterceptor(ngZone);
+      },
+      deps: [NgZone],
+    }
   ]
 })
 export class PlaygroundModule {

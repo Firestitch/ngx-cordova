@@ -3,7 +3,6 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { HttpErrorResponse, HttpHeaders, HttpRequest, HttpResponse } from '@angular/common/http';
-import { CookieService } from 'ngx-cookie-service';
 
 import { RequestOptions } from '../interfaces';
 
@@ -12,10 +11,6 @@ import { RequestOptions } from '../interfaces';
   providedIn: 'root',
 })
 export class FsCordovaHttp {
-
-  constructor(
-    private _cookieService: CookieService,
-  ) {}
 
   public get http(): any {
     const cordova = (window as any).cordova;
@@ -36,10 +31,6 @@ export class FsCordovaHttp {
           [name]: request.headers.get(name),
         };
       }, {});
-
-    const cookie = Object.keys(this._cookieService.getAll())
-      .map((name: string) => `${name}=${this._cookieService.get(name)}`)
-      .join('; ');
 
     const params = request.params.keys()
       .reduce((accum, name: string) => {
@@ -73,7 +64,7 @@ export class FsCordovaHttp {
       params,
       headers: {
         ...headers,
-        ['Cookie']: cookie,
+        ['Cookie']: document.cookie,
       },
       serializer,
     });

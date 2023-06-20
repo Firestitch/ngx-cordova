@@ -1,7 +1,7 @@
 {
   "name": "@firestitch/cordova",
   "title": "Cordova",
-  "version": "12.0.2",
+  "version": "12.0.3",
   "repository": {
     "type": "git",
     "url": "https://github.com/Firestitch/ngx-clicordovapboard"
@@ -43,7 +43,7 @@
     "@angular/router": "^12.2.15",
     "@capacitor/assets": "^2.0.4",
     "@compodoc/compodoc": "^1.1.10",
-    "@firestitch/api": "^8.1.10",
+    "@firestitch/api": "^12.3.7",
     "@firestitch/autocomplete": "^12.0.0",
     "@firestitch/autocomplete-chips": "^12.0.0",
     "@firestitch/clear": "^12.0.0",
@@ -55,6 +55,7 @@
     "@firestitch/drawer": "^12.0.0",
     "@firestitch/example": "^12.0.0",
     "@firestitch/exif-js": "^2.3.0",
+    "@firestitch/file": "^12.12.1",
     "@firestitch/form": "^12.0.1",
     "@firestitch/iframe": "^12.0.0",
     "@firestitch/label": "^12.0.0",
@@ -77,7 +78,6 @@
     "highlight.js": "^9.15.10",
     "lodash-es": "^4.17.15",
     "ng-packagr": "^12.2.6",
-    "ngx-cookie-service": "^12.0.0",
     "ngx-highlightjs": "^4.1.4",
     "ngx-toastr": "^14.2.1",
     "npm-run-all": "^4.1.5",
