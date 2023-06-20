@@ -1,14 +1,10 @@
-import { Inject, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 
 import { from, Observable, of } from 'rxjs';
 import { switchMap, tap } from 'rxjs/operators';
 
-import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { Platform } from '@ionic/angular';
-import { StatusBar } from '@ionic-native/status-bar/ngx';
 
-import { FS_CORDOVA_CONFIG } from '../consts';
-import { FsCordovaConfig } from '../interfaces';
 import { CordovaState } from '../enums';
 import { getCordova } from '../helpers';
 
@@ -20,12 +16,12 @@ import { FsCordovaCookie } from './cordova-cookie.service';
 })
 export class FsCordova {
 
+  public File;
+  public FileReader;
+
   private _ready = false;
 
   constructor(
-    @Inject(FS_CORDOVA_CONFIG) private _config: FsCordovaConfig,
-    private _splashScreen: SplashScreen,
-    private _statusbar: StatusBar,
     private _platform: Platform,
     private _cordovaCookie: FsCordovaCookie,
   ) {}
@@ -48,20 +44,23 @@ export class FsCordova {
     return this._platform.resume;
   }
 
+  public get window(): any {
+    return window as any;
+  }
+
   public _cordovaReady(): Observable<void> {
-    const win = (window as any);
-    if(win.cordova || !win.cordovaState) {
+    if(this.window.cordova || !this.window.cordovaState) {
       return of(null);
     }
 
     return new Observable((observer) => {
-      if(win.cordovaState === CordovaState.Ready) {
-        observer.next(win.cordova);
+      if(this.window.cordovaState === CordovaState.Ready) {
+        observer.next(this.window.cordova);
         observer.complete();
       }
 
-      window.addEventListener('cordovaready', () => {
-        observer.next(win.cordova);
+      this.window.addEventListener('cordovaready', () => {
+        observer.next(this.window.cordova);
         observer.complete();
       });
     })
@@ -95,15 +94,46 @@ export class FsCordova {
   }
 
   public init(): Observable<void> {
+    this._initFile();
+
     return this.ready$
       .pipe(
-        switchMap(() => this._cordovaCookie.init()),
         tap(() => {
           console.log('Cordova Service init() ready');
-          this._statusbar.styleLightContent();
-          this._splashScreen.hide();
+        }),
+        switchMap(() => this._cordovaCookie.init()),
+        tap(() => {
+          this._initInsets();
         }),
       );
+  }
+
+  private _initInsets() {
+    if(this.window.totalpave) {
+      this.window.totalpave.Insets.addListener((insets) => {
+        const root: any = document.querySelector(':root');
+        root.style.setProperty('--safe-area-inset-top', `${insets.top}px`);
+        root.style.setProperty('--safe-area-inset-right', `${insets.right}px`);
+        root.style.setProperty('--safe-area-inset-bottom', `${insets.bottom}px`);
+        root.style.setProperty('--safe-area-inset-left', `${insets.left}px`);
+      });
+    }
+  }
+
+  /**
+   * Restored the File/FileReader object from cordova-plugin-file overriding it
+   */
+  private _initFile(): void {
+    const nativeFile = this.window.File;
+    const nativeFileReader = this.window.FileReader;
+
+    this.ready$
+      .subscribe(() => {
+        this.File = this.window.File;
+        this.FileReader = this.window.FileReader;
+        this.window.File = nativeFile;
+        this.window.FileReader = nativeFileReader;
+      });
   }
 
 }

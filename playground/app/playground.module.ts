@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Routes } from '@angular/router';
 import { BrowserModule } from '@angular/platform-browser';
@@ -7,17 +7,22 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { FsExampleModule } from '@firestitch/example';
 import { FsMessageModule } from '@firestitch/message';
 import { FsLabelModule } from '@firestitch/label';
-import { FsStoreModule } from '@firestitch/store';
+import { FsStore, FsStoreModule } from '@firestitch/store';
 
 import { ToastrModule } from 'ngx-toastr';
 
 import { AppMaterialModule } from './material.module';
 import {
   ExamplesComponent,
-  CopyComponent
+  CordovaComponent
 } from './components';
 import { AppComponent } from './app.component';
 import { FsCordovaModule } from 'src/app/cordova.module';
+import { CordovaHttpInterceptor, FsCordova, FsCordovaHttp } from '@firestitch/cordova';
+import { of } from 'rxjs';
+import { switchMap, tap } from 'rxjs/operators';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { Platform } from '@ionic/angular';
 
 
 const routes: Routes = [
@@ -32,9 +37,9 @@ const routes: Routes = [
     AppMaterialModule,
     FormsModule,
     FsLabelModule,
-    FsStoreModule,
+    FsStoreModule.forRoot(),
     FsExampleModule.forRoot(),
-    FsCordovaModule,
+    FsCordovaModule.forRoot(),
     FsMessageModule.forRoot(),
     ToastrModule.forRoot({ preventDuplicates: true }),
     RouterModule.forRoot(routes),
@@ -42,8 +47,34 @@ const routes: Routes = [
   declarations: [
     AppComponent,
     ExamplesComponent,
-    CopyComponent,
+    CordovaComponent,
   ],
+  providers: [
+    {
+      provide: APP_INITIALIZER,
+      useFactory: (
+        cordova: FsCordova,
+      ) => () => {
+        return of(null)
+          .pipe(
+            switchMap(() => cordova.getAppVersion()),
+            tap((version: string) => {
+              console.log('Cordova Version', version);
+            }),
+            switchMap(() => cordova.init()),
+          )
+          .toPromise();
+      },
+      multi: true,
+      deps: [FsCordova],
+    },    
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: CordovaHttpInterceptor,
+      multi: true,
+      deps: [Platform, FsCordovaHttp],
+    },
+  ]
 })
 export class PlaygroundModule {
 }

@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 
+import { FsStore } from '@firestitch/store';
 import { parse } from '@firestitch/date';
 
 import { Observable, of } from 'rxjs';
-import { catchError, mapTo } from 'rxjs/operators';
 
 import { Platform } from '@ionic/angular';
 import { isAfter, isBefore } from 'date-fns';
-import { CookieService } from 'ngx-cookie-service';
+import setCookie from 'set-cookie-parser';
 
 
 @Injectable({
@@ -15,85 +15,42 @@ import { CookieService } from 'ngx-cookie-service';
 })
 export class FsCordovaCookie {
 
+  private _cookies = [];
+
   constructor(
     private _platform: Platform,
-    private _cookieService: CookieService,
+    private _store: FsStore,
   ) {}
 
   public init(): Observable<void> {
-    if(!this._platform.is('ios')) {
+    if(!this._platform.is('ios') && !this._platform.is('android')) {
       return of(null);
     }
 
-    this._polyfillCookie();
+    this._cookies = (this._store.get('cookie') || [])
+      .map((cookie) => ({
+        ...cookie,
+        expires: parse(cookie.expires),
+      }));
 
-    return this.saveCookies()
-      .pipe(
-        mapTo(null),
-      );
+    this.polyfillCookie();
+
+    return of(null);
   }
 
-  public saveCookies(): Observable<any> {
-    return new Observable((observer) => {
-      // https://github.com/CWBudde/cordova-plugin-wkwebview-inject-cookie
-      const wkWebView = (window as any).wkWebView;
-
-      if(!wkWebView) {
-        return observer
-          .error('window.wkWebView is required for saveCookies(). '
-          + 'cordova-plugin-wkwebview-inject-cookie not installed');
-      }
-
-      if(!wkWebView) {
-        observer.next();
-        observer.complete();
-
-        return;
-      }
-
-      wkWebView.getCookies(window.location.host,
-        (cookies: {
-          HTTPOnly: boolean;
-          domain: string;
-          name: string;
-          expireDate: string;
-          path: string;
-          sessionOnly: boolean;
-          value: string;
-        }[]) => {
-          cookies = cookies.map((cookie) => ({
-            ...cookie,
-            value: decodeURIComponent(cookie.value),
-          }));
-
-          cookies
-            .filter((cookie) => !cookie.HTTPOnly)
-            .forEach((cookie) => {
-              this._cookieService.set(cookie.name, cookie.value, parse(cookie.expireDate));
-            });
-
-          observer.next();
-          observer.complete();
-        },
-        (error) => {
-          observer.error(error);
-        });
-    })
-      .pipe(
-        catchError((error) =>{
-          console.error(error);
-
-          return of(null);
-        }),
-      );
+  public parseCookies(cookieStr: string): {
+    name?: string;
+    expires?: Date;
+    path?: string;
+    value?: string;
+  }[] {
+    return setCookie.parse(setCookie.splitCookiesString(cookieStr));
   }
 
-  private _polyfillCookie() {
-    const doc: any = document;
-    doc.cookies = [];
-    Object.defineProperty(doc, 'cookie', {
-      get() {
-        return doc.cookies
+  public polyfillCookie() {
+    Object.defineProperty(document, 'cookie', {
+      get: () => {
+        return this._cookies
           .filter((cookie) => {
             return isAfter(cookie.expires, new Date());
           })
@@ -102,78 +59,25 @@ export class FsCordovaCookie {
           })
           .join('; ');
       },
-      set(cookieStr) {
-        const cookie: {
-          name: string;
-          expires: Date;
-          path: string;
+      set: (cookieStr) => {
+        const cookies = this.parseCookies(cookieStr);
 
-        } = cookieStr.replace(/;$/,'').split(';')
-          .reduce((accum, item, index) => {
-            const values = item.split('=');
-            const name = values[0];
-            let value = values[1];
+        cookies.forEach((cookie) => {
+          const expired = isBefore(cookie.expires || 0, new Date());
 
-            if(index === 0) {
-              return {
-                ...accum,
-                name,
-                value,
-              };
-            }
+          this._cookies = this._cookies
+            .filter((item) => {
+              return item.name !== cookie.name;
+            });
 
-            if(name === 'expires') {
-              value = new Date(value);
-            }
+          if(!expired) {
+            this._cookies.push(cookie);
+          }
+        });
 
-            return {
-              ...accum,
-              [name]: value,
-            };
-          }, {});
-
-        doc.cookies =  doc.cookies
-          .filter((item) => {
-            return item.name !== cookie.name;
-          });
-
-        const expired = isBefore(cookie.expires || 0, new Date());
-
-        if(!expired) {
-          doc.cookies.push(cookie);
-        }
+        this._store.set('cookie', this._cookies);
       },
     });
   }
 
-  private _injectCookie(): Observable<void> {
-    return new Observable((observer) => {
-      const wkWebView = (window as any).wkWebView;
-
-      if(!wkWebView) {
-        return observer.error('window.wkWebView is required for injectCookie(). cordova-plugin-wkwebview-inject-cookie not installed');
-      }
-
-      const domain = window.location.host;
-      wkWebView.injectCookie(domain, '/',
-        () => {
-          console.log(`Inject Cookie Successful for domain ${domain}`);
-          observer.next(null);
-          observer.complete();
-        },
-        (event) => {
-          observer.error({ message: `Inject Cookie Error for domain ${domain}`, event });
-        },
-      );
-    })
-      .pipe(
-        catchError((error) =>{
-          console.error(error);
-
-          return of(null);
-        }),
-      );
-  }
-
 }
-

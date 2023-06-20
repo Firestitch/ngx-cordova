@@ -1,1 +1,1 @@
-export * from './ios-cookie.interceptor';
+export * from './cordova-http.interceptor';
