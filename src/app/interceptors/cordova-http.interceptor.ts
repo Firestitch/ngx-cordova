@@ -18,10 +18,6 @@ export class CordovaHttpInterceptor implements HttpInterceptor {
   ) {}
 
   public intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    if (!this._platform.is('ios') && !this._platform.is('android')) {
-      return next.handle(request);
-    }
-
-    return this._cordovaHttp.sendRequest(request);
+    return this._platform.is('hybrid') ? this._cordovaHttp.sendRequest(request) : next.handle(request);
   }
 }

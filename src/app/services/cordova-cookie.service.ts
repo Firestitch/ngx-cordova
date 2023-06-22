@@ -23,7 +23,7 @@ export class FsCordovaCookie {
   ) {}
 
   public init(): Observable<void> {
-    if(!this._platform.is('ios') && !this._platform.is('android')) {
+    if(!this._platform.is('hybrid')) {
       return of(null);
     }
 
