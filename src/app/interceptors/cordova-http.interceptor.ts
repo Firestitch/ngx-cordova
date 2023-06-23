@@ -7,7 +7,6 @@ import {
 } from '@angular/common/http';
 
 import { FsCordova, FsCordovaHttp } from '../services';
-import { CordovaState } from '../enums';
 
 
 @Injectable()

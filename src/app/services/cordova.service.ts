@@ -64,10 +64,6 @@ export class FsCordova {
     return this.state === CordovaState.Unsupported;
   }
 
-  public get supported(): boolean {
-    return !this.unsupported;
-  }
-
   public _cordovaReady(): Observable<void> {
     if(this.state === CordovaState.Unsupported) {
       return throwError('Cordova not supported');
@@ -83,13 +79,16 @@ export class FsCordova {
         observer.complete();
       }
 
-      this.window.addEventListener('cordovaready', () => {
+      this.window.addEventListener('fsCordovaReady', () => {        
         observer.next(this.cordova);
         observer.complete();
       });
     })
       .pipe(
         switchMap((cordova: any) => this._cordovaPluginsReady(cordova)),
+        tap(() => {
+          this.window.cordovaState = CordovaState.Ready;
+        }),
       );
   }
 

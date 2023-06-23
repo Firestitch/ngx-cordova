@@ -24,8 +24,7 @@ export function initCordova() {
     const script = document.createElement('script');
     script.src = 'cordova.js';
     script.onload = () => {
-      (window as any).cordovaState = CordovaState.Ready;
-      window.dispatchEvent(new CustomEvent('cordovaready', {
+      window.dispatchEvent(new CustomEvent('fsCordovaReady', {
         detail: {},
         bubbles: true,
         cancelable: true,
