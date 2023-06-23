@@ -5,7 +5,6 @@ import { parse } from '@firestitch/date';
 
 import { Observable, of } from 'rxjs';
 
-import { Platform } from '@ionic/angular';
 import { isAfter, isBefore } from 'date-fns';
 import setCookie from 'set-cookie-parser';
 
@@ -18,15 +17,10 @@ export class FsCordovaCookie {
   private _cookies = [];
 
   constructor(
-    private _platform: Platform,
     private _store: FsStore,
   ) {}
 
-  public init(): Observable<void> {
-    if(!this._platform.is('hybrid')) {
-      return of(null);
-    }
-
+  public init(): void {
     this._cookies = (this._store.get('cookie') || [])
       .map((cookie) => ({
         ...cookie,
@@ -34,8 +28,6 @@ export class FsCordovaCookie {
       }));
 
     this.polyfillCookie();
-
-    return of(null);
   }
 
   public parseCookies(cookieStr: string): {

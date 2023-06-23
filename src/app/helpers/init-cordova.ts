@@ -38,5 +38,7 @@ export function initCordova() {
 
     const base = document.getElementsByTagName('base')[0];
     base.setAttribute('href', '.');
+  } else {
+    (window as any).cordovaState = CordovaState.Unsupported;
   }
 }

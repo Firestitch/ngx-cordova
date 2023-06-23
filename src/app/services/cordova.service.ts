@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { from, Observable, of } from 'rxjs';
+import { from, Observable, of, throwError } from 'rxjs';
 import { switchMap, tap } from 'rxjs/operators';
 
 import { Platform } from '@ionic/angular';
@@ -48,19 +48,43 @@ export class FsCordova {
     return window as any;
   }
 
+  public get state(): CordovaState {
+    return this.window.cordovaState;
+  }
+
+  public get cordova(): any {
+    return this.window.cordova;
+  }
+
+  public get ready(): boolean {
+    return this.state === CordovaState.Ready;
+  }
+
+  public get unsupported(): boolean {
+    return this.state === CordovaState.Unsupported;
+  }
+
+  public get supported(): boolean {
+    return !this.unsupported;
+  }
+
   public _cordovaReady(): Observable<void> {
-    if(this.window.cordova || !this.window.cordovaState) {
+    if(this.state === CordovaState.Unsupported) {
+      return throwError('Cordova not supported');
+    }
+
+    if(this.cordova) {
       return of(null);
     }
 
     return new Observable((observer) => {
-      if(this.window.cordovaState === CordovaState.Ready) {
-        observer.next(this.window.cordova);
+      if(this.state === CordovaState.Ready) {
+        observer.next(this.cordova);
         observer.complete();
       }
 
       this.window.addEventListener('cordovaready', () => {
-        observer.next(this.window.cordova);
+        observer.next(this.cordova);
         observer.complete();
       });
     })
@@ -101,15 +125,13 @@ export class FsCordova {
         tap(() => {
           console.log('Cordova Service init() ready');
         }),
-        switchMap(() => this._cordovaCookie.init()),
-        tap(() => {
-          this._initInsets();
-        }),
+        tap(() => this._cordovaCookie.init()),
+        tap(() => this._initInsets()),
       );
   }
 
   private _initInsets() {
-    if(this.window.totalpave) {
+    if(this.window.totalpave) {6
       this.window.totalpave.Insets.addListener((insets) => {
         const root: any = document.querySelector(':root');
         root.style.setProperty('--safe-area-inset-top', `${insets.top}px`);

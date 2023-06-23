@@ -5,19 +5,19 @@ import { Observable } from 'rxjs';
 import {
   HttpEvent, HttpHandler, HttpInterceptor, HttpRequest,
 } from '@angular/common/http';
-import { Platform } from '@ionic/angular';
 
-import { FsCordovaHttp } from '../services';
+import { FsCordova, FsCordovaHttp } from '../services';
+import { CordovaState } from '../enums';
 
 
 @Injectable()
 export class CordovaHttpInterceptor implements HttpInterceptor {
   constructor(
-    private _platform: Platform,
+    private _cordova: FsCordova,
     private _cordovaHttp: FsCordovaHttp,
   ) {}
 
   public intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    return this._platform.is('hybrid') ? this._cordovaHttp.sendRequest(request) : next.handle(request);
+    return this._cordova.ready ? this._cordovaHttp.sendRequest(request) : next.handle(request);
   }
 }

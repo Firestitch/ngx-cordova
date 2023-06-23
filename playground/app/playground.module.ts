@@ -20,7 +20,7 @@ import { AppComponent } from './app.component';
 import { FsCordovaModule } from 'src/app/cordova.module';
 import { CordovaCameraFileService, CordovaFileClickInterceptor, CordovaHttpInterceptor, FsCordova, FsCordovaHttp } from '@firestitch/cordova';
 import { of } from 'rxjs';
-import { switchMap, tap } from 'rxjs/operators';
+import { catchError, switchMap, tap } from 'rxjs/operators';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { Platform } from '@ionic/angular';
 import { FS_FILE_CLICK_INTERCEPTOR } from '@firestitch/file';
@@ -62,7 +62,11 @@ const routes: Routes = [
             tap((version: string) => {
               console.log('Cordova Version', version);
             }),
-            switchMap(() => cordova.init()),
+            switchMap(() => cordova.init()
+              .pipe(
+                catchError(() => of(null))
+              )
+            ),
           )
           .toPromise();
       },
@@ -73,7 +77,7 @@ const routes: Routes = [
       provide: HTTP_INTERCEPTORS,
       useClass: CordovaHttpInterceptor,
       multi: true,
-      deps: [Platform, FsCordovaHttp],
+      deps: [FsCordova, FsCordovaHttp],
     },
     {
       provide: FS_FILE_CLICK_INTERCEPTOR,
