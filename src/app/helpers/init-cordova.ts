@@ -23,7 +23,8 @@ export function initCordova() {
     (window as any).cordovaState = CordovaState.Pending;
     const script = document.createElement('script');
     script.src = 'cordova.js';
-    script.onload = () => {
+    script.onload = () => {      
+      (window as any).cordovaState = CordovaState.Ready;
       window.dispatchEvent(new CustomEvent('fsCordovaReady', {
         detail: {},
         bubbles: true,

@@ -52,6 +52,10 @@ export class FsCordova {
     return this.window.cordovaState;
   }
 
+  public set state(value: CordovaState) {
+    this.window.cordovaState = value;
+  }
+
   public get cordova(): any {
     return this.window.cordova;
   }
@@ -79,16 +83,13 @@ export class FsCordova {
         observer.complete();
       }
 
-      this.window.addEventListener('fsCordovaReady', () => {        
+      this.window.addEventListener('fsCordovaReady', () => {  
         observer.next(this.cordova);
         observer.complete();
       });
     })
       .pipe(
         switchMap((cordova: any) => this._cordovaPluginsReady(cordova)),
-        tap(() => {
-          this.window.cordovaState = CordovaState.Ready;
-        }),
       );
   }
 
