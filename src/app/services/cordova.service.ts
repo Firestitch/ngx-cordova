@@ -73,16 +73,11 @@ export class FsCordova {
       return throwError('Cordova not supported');
     }
 
-    if(this.cordova) {
+    if(this.state === CordovaState.Ready) {
       return of(null);
     }
 
     return new Observable((observer) => {
-      if(this.state === CordovaState.Ready) {
-        observer.next(this.cordova);
-        observer.complete();
-      }
-
       this.window.addEventListener('fsCordovaReady', () => {  
         observer.next(this.cordova);
         observer.complete();
