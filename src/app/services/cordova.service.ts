@@ -10,6 +10,9 @@ import { getCordova } from '../helpers';
 
 import { FsCordovaCookie } from './cordova-cookie.service';
 
+const NativeFile = window.File;
+const NativeFileReader = window.FileReader;
+
 
 @Injectable({
   providedIn: 'root',
@@ -18,8 +21,6 @@ export class FsCordova {
 
   public CordovaFile;
   public CordovaFileReader;
-  public NativeFile;
-  public NativeFileReader;
   
   private _ready = false;
 
@@ -80,13 +81,29 @@ export class FsCordova {
     }
 
     return new Observable((observer) => {
-      this.window.addEventListener('fsCordovaReady', () => {  
+      if(this.cordova) {
+        observer.next(this.cordova);
+        observer.complete();
+        return;
+      }
+
+      this.window.addEventListener('cordovaLoaded', () => {  
         observer.next(this.cordova);
         observer.complete();
       });
     })
       .pipe(
-        switchMap((cordova: any) => this._cordovaPluginsReady(cordova)),
+        switchMap((cordova: any) => new Observable<void>((observer) => {
+          const channel = cordova.require('cordova/channel');
+          channel.onCordovaReady
+            .subscribe(() => {
+              observer.next();
+              observer.complete();
+            });
+        })),
+        tap(() => {
+          this.state = CordovaState.Ready;
+        }),
       );
   }
 
@@ -98,26 +115,7 @@ export class FsCordova {
     return from<string>(getCordova().getAppVersion.getVersionNumber());
   }
 
-  public _cordovaPluginsReady(cordova): Observable<void> {
-    const channel = cordova.require('cordova/channel');
-
-    if(channel.state === 2) {
-      return of(null);
-    }
-
-    return new Observable((observer) => {
-      channel.onPluginsReady
-        .subscribe(() => {
-          observer.next();
-          observer.complete();
-        });
-    });
-  }
-
   public init(): Observable<void> {
-    this.NativeFile = this.window.File;
-    this.NativeFileReader = this.window.FileReader;
-
     return this.ready$
       .pipe(
         tap(() => {
@@ -130,7 +128,7 @@ export class FsCordova {
   }
 
   private _initInsets() {
-    if(this.window.totalpave) {6
+    if(this.window.totalpave) {
       this.window.totalpave.Insets.addListener((insets) => {
         const root: any = document.querySelector(':root');
         root.style.setProperty('--safe-area-inset-top', `${insets.top}px`);
@@ -147,9 +145,8 @@ export class FsCordova {
   private _initFile(): void {
     this.CordovaFile = this.window.File;
     this.CordovaFileReader = this.window.FileReader;
-    this.window.File = this.NativeFile;
-    this.window.FileReader = this.NativeFileReader;
-
+    this.window.File = NativeFile;
+    this.window.FileReader = NativeFileReader;
     this.window.CordovaFile = this.CordovaFile;
     this.window.CordovaFileReader = this.CordovaFileReader;
   }
