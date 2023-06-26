@@ -7,7 +7,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { FsExampleModule } from '@firestitch/example';
 import { FsMessageModule } from '@firestitch/message';
 import { FsLabelModule } from '@firestitch/label';
-import { FsStore, FsStoreModule } from '@firestitch/store';
+import { FsStoreModule } from '@firestitch/store';
 
 import { ToastrModule } from 'ngx-toastr';
 
@@ -18,11 +18,10 @@ import {
 } from './components';
 import { AppComponent } from './app.component';
 import { FsCordovaModule } from 'src/app/cordova.module';
-import { CordovaCameraFileService, CordovaFileClickInterceptor, CordovaHttpInterceptor, FsCordova, FsCordovaHttp } from '@firestitch/cordova';
+import { CordovaFileClickInterceptor, CordovaHttpInterceptor, FsCordova, FsCordovaHttp } from '@firestitch/cordova';
 import { of } from 'rxjs';
 import { catchError, switchMap, tap } from 'rxjs/operators';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { Platform } from '@ionic/angular';
 import { FS_FILE_CLICK_INTERCEPTOR } from '@firestitch/file';
 
 

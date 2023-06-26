@@ -1,6 +1,6 @@
 import { Observable, of } from 'rxjs';
 
-import { InputProcessorService, FileClickHandler, FileClickInterceptor, FsFile } from '@firestitch/file';
+import { InputProcessorService, FileClickHandler, FileClickInterceptor } from '@firestitch/file';
 
 import { hasCordovaCameraSupport } from '../helpers';
 import { CordovaCameraFileService, FsCordova } from '../services';
@@ -23,7 +23,7 @@ export class CordovaFileClickInterceptor extends FileClickInterceptor {
       //   this._cordovaCameraFileService.selectCordovaCameraLibrary();  
         
       //   return of(null);      
-      // } else 
+      // } 
       
       if (inputProcessorService.capture === 'camera' && inputProcessorService.isAcceptImage()) {
         return (new CordovaCameraFileService())

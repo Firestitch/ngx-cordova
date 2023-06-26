@@ -16,9 +16,11 @@ import { FsCordovaCookie } from './cordova-cookie.service';
 })
 export class FsCordova {
 
-  public File;
-  public FileReader;
-
+  public CordovaFile;
+  public CordovaFileReader;
+  public NativeFile;
+  public NativeFileReader;
+  
   private _ready = false;
 
   constructor(
@@ -113,13 +115,15 @@ export class FsCordova {
   }
 
   public init(): Observable<void> {
-    this._initFile();
+    this.NativeFile = this.window.File;
+    this.NativeFileReader = this.window.FileReader;
 
     return this.ready$
       .pipe(
         tap(() => {
           console.log('Cordova Service init() ready');
         }),
+        tap(() => this._initFile()),
         tap(() => this._cordovaCookie.init()),
         tap(() => this._initInsets()),
       );
@@ -141,19 +145,13 @@ export class FsCordova {
    * Restored the File/FileReader object from cordova-plugin-file overriding it
    */
   private _initFile(): void {
-    const nativeFile = this.window.File;
-    const nativeFileReader = this.window.FileReader;
+    this.CordovaFile = this.window.File;
+    this.CordovaFileReader = this.window.FileReader;
+    this.window.File = this.NativeFile;
+    this.window.FileReader = this.NativeFileReader;
 
-    this.ready$
-      .subscribe(() => {
-        this.File = this.window.File;
-        this.FileReader = this.window.FileReader;
-        this.window.File = nativeFile;
-        this.window.FileReader = nativeFileReader;
-
-        this.window.CordovaFile = this.File;
-        this.window.CordovaFileReader = this.FileReader;
-      });
+    this.window.CordovaFile = this.CordovaFile;
+    this.window.CordovaFileReader = this.CordovaFileReader;
   }
 
 }

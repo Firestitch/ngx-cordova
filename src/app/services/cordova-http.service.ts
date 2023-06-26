@@ -148,6 +148,7 @@ export class FsCordovaHttp {
     if(httpResponse) {
       log.push(...[
         status,
+        options.headers,
         httpResponse.body || '',
         httpResponse.headers.keys()
           .filter((name) => typeof httpResponse.headers.get(name) === 'string')
