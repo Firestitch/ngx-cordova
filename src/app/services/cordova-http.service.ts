@@ -96,10 +96,10 @@ export class FsCordovaHttp {
           observer.complete();
         },
         (error) => {
-          if (!error.status) {
+          if (error.status <= 0) {
             this._log(url, options);
 
-            return observer.error(error);
+            return observer.error(new HttpErrorResponse(error));
           }
 
           let body = error.error;
