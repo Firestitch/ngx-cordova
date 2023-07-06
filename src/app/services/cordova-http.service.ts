@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 
 import { Observable } from 'rxjs';
 
-import { HttpErrorResponse, HttpHeaders, HttpRequest, HttpResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpHeaders, HttpRequest, HttpResponse, HttpResponseBase } from '@angular/common/http';
 
 import { RequestOptions } from '../interfaces';
 
@@ -89,7 +89,7 @@ export class FsCordovaHttp {
             url: response.url,
           });
 
-          this._log(url, options, httpResponse);
+          this._log(options, body, httpResponse);
           document.cookie = response.headers['set-cookie'];
 
           observer.next(httpResponse);
@@ -97,9 +97,14 @@ export class FsCordovaHttp {
         },
         (error) => {
           if (error.status <= 0) {
-            this._log(url, options);
+            const errorResponse = new HttpErrorResponse({
+              ...error,
+              url,
+            });
 
-            return observer.error(new HttpErrorResponse(error));
+            this._log(options, '', errorResponse);
+
+            return observer.error();
           }
 
           let body = error.error;
@@ -122,11 +127,13 @@ export class FsCordovaHttp {
               statusText: httpResponse.statusText,
               url: httpResponse.url,
             });
+            
+            this._log(options, httpResponse.body, errorResponse);
 
             return observer.error(errorResponse);
           }
 
-          this._log(url, options, httpResponse);
+          this._log(options, httpResponse.body, httpResponse);
 
           observer.next(httpResponse);
           observer.complete();
@@ -134,8 +141,8 @@ export class FsCordovaHttp {
     });
   }
 
-  private _log(url, options: RequestOptions, httpResponse?: HttpResponse<any>) {
-    const _url = new URL(url);
+  private _log(options: RequestOptions, body?, httpResponse?: HttpResponseBase) {
+    const _url = new URL(httpResponse.url);
 
     Object.keys(options.params)
       .forEach((name) => {
@@ -149,7 +156,7 @@ export class FsCordovaHttp {
       log.push(...[
         status,
         options.headers,
-        httpResponse.body || '',
+        body || '',
         httpResponse.headers.keys()
           .filter((name) => typeof httpResponse.headers.get(name) === 'string')
           .reduce((accum, name: string) => {
