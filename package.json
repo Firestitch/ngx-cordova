@@ -41,7 +41,7 @@
     "@angular/platform-browser": "^12.2.15",
     "@angular/platform-browser-dynamic": "^12.2.15",
     "@angular/router": "^12.2.15",
-    "@capacitor/assets": "^2.0.4",
+    "@capacitor/assets": "^3.0.1",
     "@compodoc/compodoc": "^1.1.10",
     "@firestitch/api": "^12.3.7",
     "@firestitch/autocomplete": "^12.0.0",
