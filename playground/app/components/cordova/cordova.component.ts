@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { FsMessage } from '@firestitch/message';
 
 
 @Component({
@@ -10,9 +9,4 @@ import { FsMessage } from '@firestitch/message';
 export class CordovaComponent {
 
   public config = {};
-
-  constructor(
-    private message: FsMessage
-  ) {
-  }
 }
