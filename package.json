@@ -1,7 +1,7 @@
 {
   "name": "@firestitch/cordova",
   "title": "Cordova",
-  "version": "13.0.1",
+  "version": "13.0.2",
   "repository": {
     "type": "git",
     "url": "https://github.com/Firestitch/ngx-clicordovapboard"
@@ -81,6 +81,7 @@
     "node": ">=10.0.0"
   },
   "dependencies": {
-    "set-cookie-parser": "^2.6.0"
+    "set-cookie-parser": "^2.6.0",
+    "@capacitor/core": "^6.0.0"
   }
 }

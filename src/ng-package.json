@@ -5,6 +5,7 @@
     "entryFile": "public_api.ts"
   },
   "allowedNonPeerDependencies": [
-    "set-cookie-parser"
+    "set-cookie-parser",
+    "@capacitor/core"
   ]
 }

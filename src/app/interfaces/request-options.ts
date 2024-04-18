@@ -1,7 +1,8 @@
+
 export interface RequestOptions {
   method: string;
   data: any;
-  params: any;
-  headers: any;
+  params: { [key: string]: string };
+  headers: { [key: string]: string };
   serializer: string;
 }
