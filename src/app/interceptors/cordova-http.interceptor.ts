@@ -14,9 +14,9 @@ export class CordovaHttpInterceptor implements HttpInterceptor {
   constructor(
     private _cordova: FsCordova,
     private _cordovaHttp: FsCordovaHttp,
-  ) {}
+  ) { }
 
   public intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    return this._cordova.ready ? this._cordovaHttp.sendRequest(request) : next.handle(request);
+    return this._cordova.ready && request.url.match(/^http/) ? this._cordovaHttp.sendRequest(request) : next.handle(request);
   }
 }
