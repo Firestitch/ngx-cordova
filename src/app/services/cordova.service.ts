@@ -10,9 +10,6 @@ import { getCordova } from '../helpers';
 
 import { FsCordovaCookie } from './cordova-cookie.service';
 
-const NativeFile = window.File;
-const NativeFileReader = window.FileReader;
-
 
 @Injectable({
   providedIn: 'root',
@@ -21,16 +18,16 @@ export class FsCordova {
 
   public CordovaFile;
   public CordovaFileReader;
-  
+
   private _ready = false;
 
   constructor(
     private _platform: Platform,
     private _cordovaCookie: FsCordovaCookie,
-  ) {}
+  ) { }
 
   public get ready$(): Observable<any> {
-    if(this._ready) {
+    if (this._ready) {
       return of(true);
     }
 
@@ -72,22 +69,22 @@ export class FsCordova {
   }
 
   public _cordovaReady(): Observable<void> {
-    if(this.state === CordovaState.Unsupported) {
+    if (this.state === CordovaState.Unsupported) {
       return throwError('Cordova not supported');
     }
 
-    if(this.state === CordovaState.Ready) {
+    if (this.state === CordovaState.Ready) {
       return of(null);
     }
 
     return new Observable((observer) => {
-      if(this.cordova) {
+      if (this.cordova) {
         observer.next(this.cordova);
         observer.complete();
         return;
       }
 
-      this.window.addEventListener('cordovaLoaded', () => {  
+      this.window.addEventListener('cordovaLoaded', () => {
         observer.next(this.cordova);
         observer.complete();
       });
@@ -108,7 +105,7 @@ export class FsCordova {
   }
 
   public getAppVersion(): Observable<string> {
-    if(!getCordova()?.getAppVersion) {
+    if (!getCordova()?.getAppVersion) {
       return of(null);
     }
 
@@ -128,7 +125,7 @@ export class FsCordova {
   }
 
   private _initInsets() {
-    if(this.window.totalpave) {
+    if (this.window.totalpave) {
       this.window.totalpave.Insets.addListener((insets) => {
         const root: any = document.querySelector(':root');
         root.style.setProperty('--safe-area-inset-top', `${insets.top}px`);
@@ -145,8 +142,8 @@ export class FsCordova {
   private _initFile(): void {
     this.CordovaFile = this.window.File;
     this.CordovaFileReader = this.window.FileReader;
-    this.window.File = NativeFile;
-    this.window.FileReader = NativeFileReader;
+    this.window.File = (window as any).NativeFile;
+    this.window.FileReader = (window as any).NativeFileReader;
     this.window.CordovaFile = this.CordovaFile;
     this.window.CordovaFileReader = this.CordovaFileReader;
   }

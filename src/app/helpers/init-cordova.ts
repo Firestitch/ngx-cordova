@@ -20,6 +20,9 @@ export function initCordova() {
   };
 
   if (cordovaSupported) {
+    (window as any).NativeFile = (window as any).File;
+    (window as any).NativeFileReader = (window as any).FileReader;
+
     (window as any).cordovaState = CordovaState.Pending;
     const script = document.createElement('script');
     script.src = 'cordova.js';
