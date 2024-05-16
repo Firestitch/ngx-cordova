@@ -47,7 +47,7 @@
     "@firestitch/autocomplete-chips": "^12.5.12",
     "@firestitch/clear": "^12.4.0",
     "@firestitch/common": "^12.7.0",
-    "@firestitch/component-tools": "^13.0.2",
+    "@firestitch/component-tools": "^13.0.6",
     "@firestitch/core": "^12.1.0",
     "@firestitch/date": "^12.4.5",
     "@firestitch/datepicker": "^12.15.10",
@@ -58,7 +58,7 @@
     "@firestitch/form": "^12.5.2",
     "@firestitch/iframe": "^12.0.7",
     "@firestitch/label": "^12.0.4",
-    "@firestitch/lint": "^12.0.20",
+    "@firestitch/lint": "^14.0.11",
     "@firestitch/menu": "^12.2.3",
     "@firestitch/message": "^12.3.1",
     "@firestitch/prompt": "^12.2.3",
@@ -81,7 +81,7 @@
     "node": ">=10.0.0"
   },
   "dependencies": {
-    "set-cookie-parser": "^2.6.0",
-    "@capacitor/core": "^6.0.0"
+    "@capacitor/core": "^6.0.0",
+    "set-cookie-parser": "^2.6.0"
   }
 }
