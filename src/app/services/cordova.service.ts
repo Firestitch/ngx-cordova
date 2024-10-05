@@ -94,7 +94,7 @@ export class FsCordova {
           const channel = cordova.require('cordova/channel');
           channel.onCordovaReady
             .subscribe(() => {
-              observer.next();
+              observer.next(null);
               observer.complete();
             });
         })),
